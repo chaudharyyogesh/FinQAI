@@ -11,13 +11,13 @@ from peft import PeftModel
 # ⬇️ *** SET THIS TO YOUR CHECKPOINT PATH *** ⬇️
 # This is the path to the checkpoint you want to test
 # (e.g., "llama-3.2-1b-en-mia-translation/checkpoint-100")
-ADAPTER_PATH = "/home/chaudhy/LinguaBridge/test/llama-3/Gen-AI/llama-3.2-1b-fino1-finetuned/checkpoint-619"
+ADAPTER_PATH = "/home/yogesh/LinguaBridge/genAI/FinQAI/llama-3.2-1b-fino1-finetuned"
 
 # This is the base model you used for training
 MODEL_ID = "meta-llama/Llama-3.2-1B-Instruct"
 
 # Set which GPU to use for inference
-INFERENCE_GPU = "5"
+INFERENCE_GPU = "0"
 
 # --- 2. Set Up Device ---
 os.environ["CUDA_VISIBLE_DEVICES"] = INFERENCE_GPU
@@ -37,7 +37,7 @@ print(f"Loading adapter and tokenizer from: {ADAPTER_PATH}")
 model = PeftModel.from_pretrained(base_model, ADAPTER_PATH)
 
 # Load the tokenizer from the adapter path
-tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+tokenizer = AutoTokenizer.from_pretrained(ADAPTER_PATH)
 tokenizer.pad_token = tokenizer.eos_token
 
 # Set model to evaluation mode
@@ -45,10 +45,7 @@ model = model.eval()
 
 # --- 5. Prepare the Prompt ---
 # This prompt must match the format you used in training
-system_prompt = "You are a finance expert."
-
-# ⬇️ *** TEST WITH YOUR OWN SENTENCE HERE *** ⬇️
-english_text = "Yes, it is sunny"
+system_prompt = "You are a finance expert. Keep the answer very short and stop answering when you are done."
 
 # Create the list of messages
 messages = [
@@ -80,11 +77,15 @@ inputs = tokenizer(
 # Generate the translation
 with torch.no_grad():
     output_tokens = model.generate(
-        **inputs,
-        max_new_tokens=75,  # Max length of a Myaamia translation
-        pad_token_id=tokenizer.eos_token_id,
-        eos_token_id=tokenizer.eos_token_id,
+    **inputs,
+    max_new_tokens=256,
+    temperature=0.7,
+    top_p=0.9,
+    repetition_penalty=1.2,
+    pad_token_id=tokenizer.eos_token_id,
+    eos_token_id=tokenizer.eos_token_id,
     )
+
 
 # Decode the output
 # We need to decode *only* the newly generated tokens
