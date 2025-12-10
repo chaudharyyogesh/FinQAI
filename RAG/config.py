@@ -11,7 +11,7 @@ DB_PATH = "./chroma_langchain_db"
 
 # The path to your local fine-tuned Llama model
 # UPDATE THIS to the actual name of your model folder!
-MODEL_PATH = "/home/yogesh/LinguaBridge/genAI/FinQAI/llama-3.2-1b-Instruct-fine-tuned" 
+MODEL_PATH = "meta-llama/Llama-3.2-3B-Instruct" 
 
 # --- Model Settings ---
 # MUST be the same for ingestion and chat. 
